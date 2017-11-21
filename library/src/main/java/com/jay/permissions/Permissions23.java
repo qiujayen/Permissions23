@@ -60,7 +60,7 @@ public class Permissions23 {
      */
     public static boolean checkPermissionPermanentlyDenied(Activity activity, @NonNull String... perms) {
         for (String perm : perms) {
-            if (checkPermissionPermanentlyDenied(activity, perm)) {
+            if (!checkPermissionPermanentlyDenied(activity, perm)) {
                 return false;
             }
         }
@@ -116,7 +116,7 @@ public class Permissions23 {
                 .setTitle(R.string.title_settings_dialog)
                 .setMessage(R.string.rationale_ask_again)
                 .setPositiveButton("是", listener)
-                .setNeutralButton("否", null).show();
+                .setNegativeButton("否", null).show();
     }
 
     public static void openAppicationSettingsActivity(Activity activity) {
