@@ -56,7 +56,7 @@ public class Permissions23 {
     /**
      * 检测权限是否被永久否认
      */
-    public static boolean checkPerissionPermanentlyDenied(Activity activity, @NonNull String... perms) {
+    public static boolean checkPermissionPermanentlyDenied(Activity activity, @NonNull String... perms) {
         for (String perm : perms) {
             if (checkPermissionPermanentlyDenied(activity, perm)) {
                 return false;
@@ -91,7 +91,7 @@ public class Permissions23 {
      * 检测权限是否被永久否认
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static boolean checkPerissionPermanentlyDenied(Fragment fragment, @NonNull String... perms) {
+    public static boolean checkPermissionPermanentlyDenied(Fragment fragment, @NonNull String... perms) {
         for (String perm : perms) {
             if (checkPermissionPermanentlyDenied(fragment, perm)) {
                 return false;
@@ -100,7 +100,7 @@ public class Permissions23 {
         return true;
     }
 
-    public static boolean checkPerissionPermanentlyDenied(android.support.v4.app.Fragment fragment, @NonNull String... perms) {
+    public static boolean checkPermissionPermanentlyDenied(android.support.v4.app.Fragment fragment, @NonNull String... perms) {
         for (String perm : perms) {
             if (checkPermissionPermanentlyDenied(fragment, perm)) {
                 return false;
