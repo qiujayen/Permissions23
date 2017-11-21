@@ -16,6 +16,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,9 +27,9 @@ public class Permissions23 {
 
     public interface PermissionCallback/* extends ActivityCompat.OnRequestPermissionsResultCallback */ {
 
-        void onPermissionsGranted(int requestCode, boolean isAllAccept, List<String> perms);
+        void onPermissionsGranted(int requestCode, boolean isAllAccept, String... perms);
 
-        void onPermissionsDenied(int requestCode, boolean isAllReject, List<String> perms);
+        void onPermissionsDenied(int requestCode, boolean isAllReject, String... perms);
 
     }
 
@@ -136,11 +138,15 @@ public class Permissions23 {
         }
         // Report granted permissions, if any.
         if (!granted.isEmpty()) {
-            callback.onPermissionsGranted(requestCode, denied.isEmpty(), granted);
+            String[] grantedArray = new String[granted.size()];
+            granted.toArray(grantedArray);
+            callback.onPermissionsGranted(requestCode, denied.isEmpty(), grantedArray);
         }
         // Report denied permissions, if any.
         if (!denied.isEmpty()) {
-            callback.onPermissionsDenied(requestCode, granted.isEmpty(), denied);
+            String[] deniedArray = new String[denied.size()];
+            denied.toArray(deniedArray);
+            callback.onPermissionsDenied(requestCode, granted.isEmpty(), deniedArray);
         }
 
     }
