@@ -1,0 +1,4 @@
+<resources>
+    <string name="rationale_ask_again">发现有权限未授权。这个应用程序可能无法正常工作。是否打开应用设置界面来修改应用权限。</string>
+    <string name="title_settings_dialog">权限要求</string>
+</resources>
