@@ -119,10 +119,16 @@ public class Permissions23 {
                 .setNegativeButton("否", null).show();
     }
 
-    public static void openAppicationSettingsActivity(Activity activity) {
+    public static void openApplicationSettingsActivity(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
         activity.startActivity(intent);
+    }
+
+    public static void openApplicationSettingsActivity(Activity activity, int requestCode) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
+        activity.startActivityForResult(intent, requestCode);
     }
 
     public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, PermissionCallback callback) {
