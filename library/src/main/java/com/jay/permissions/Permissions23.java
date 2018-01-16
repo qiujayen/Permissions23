@@ -2,6 +2,7 @@ package com.jay.permissions;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,135 +26,57 @@ import java.util.List;
  */
 public class Permissions23 {
 
-    public interface PermissionCallback/* extends ActivityCompat.OnRequestPermissionsResultCallback */ {
+    private static final String TAG = "Permissions23";
+    private final PermissionsFragment mPermissionsFragment;
 
-        void onPermissionsGranted(int requestCode, boolean isAllAccept, String... perms);
-
-        void onPermissionsDenied(int requestCode, boolean isAllReject, String... perms);
-
+    public Permissions23(Activity activity) {
+        mPermissionsFragment = getPermissionsFragment(activity);
     }
 
-    public static boolean hasPermissions(@NonNull Context context, @NonNull String... perms) {
-        for (String perm : perms) {
-            if (ContextCompat.checkSelfPermission(context, perm) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
+
+    private PermissionsFragment getPermissionsFragment(Activity activity) {
+        PermissionsFragment permissionsFragment = (PermissionsFragment) activity.getFragmentManager().findFragmentByTag(TAG);
+        if (permissionsFragment == null) {
+            permissionsFragment = new PermissionsFragment();
+            FragmentManager fragmentManager = activity.getFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .add(permissionsFragment, TAG)
+                    .commitAllowingStateLoss();
+            fragmentManager.executePendingTransactions();
         }
-        return true;
+        return permissionsFragment;
     }
 
-    /** Activity */
-
-    public static void requestPermissions(Activity activity, int requestCode, @NonNull String... perms) {
-        ActivityCompat.requestPermissions(activity, perms, requestCode);
-    }
-
-    /**
-     * 检测权限是否被永久否认
-     */
-    public static boolean checkPermissionPermanentlyDenied(Activity activity, @NonNull String perm) {
-        return !ActivityCompat.shouldShowRequestPermissionRationale(activity, perm);
-    }
-
-    /**
-     * 检测权限是否被永久否认
-     */
-    public static boolean checkPermissionPermanentlyDenied(Activity activity, @NonNull String... perms) {
-        for (String perm : perms) {
-            if (!checkPermissionPermanentlyDenied(activity, perm)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Fragment */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static void requestPermissions(Fragment fragment, int requestCode, @NonNull String... perms) {
-        fragment.requestPermissions(perms, requestCode);
+    public void requestPermissions(String[] permissions, Callback callback) {
+        mPermissionsFragment.requestPermissions(permissions, callback);
     }
 
-    public static void requestPermissions(android.support.v4.app.Fragment fragment, int requestCode, @NonNull String... perms) {
-        fragment.requestPermissions(perms, requestCode);
-    }
-
-    /**
-     * 检测权限是否被永久否认
-     */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static boolean checkPermissionPermanentlyDenied(Fragment fragment, @NonNull String perm) {
-        return fragment.shouldShowRequestPermissionRationale(perm);
+    public static boolean hasPermission(Activity activity, String permission) {
+        return activity.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public static boolean checkPermissionPermanentlyDenied(android.support.v4.app.Fragment fragment, @NonNull String perm) {
-        return fragment.shouldShowRequestPermissionRationale(perm);
-    }
-
-    /**
-     * 检测权限是否被永久否认
-     */
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public static boolean checkPermissionPermanentlyDenied(Fragment fragment, @NonNull String... perms) {
-        for (String perm : perms) {
-            if (checkPermissionPermanentlyDenied(fragment, perm)) {
+    public static boolean hasPermissions(Activity activity, String[] permissions) {
+        for (String permission : permissions) {
+            if (!hasPermission(activity, permission)) {
                 return false;
             }
         }
         return true;
     }
 
-    public static boolean checkPermissionPermanentlyDenied(android.support.v4.app.Fragment fragment, @NonNull String... perms) {
-        for (String perm : perms) {
-            if (checkPermissionPermanentlyDenied(fragment, perm)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static void showAppSettingsDialog(Activity activity, DialogInterface.OnClickListener listener) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.title_settings_dialog)
-                .setMessage(R.string.rationale_ask_again)
-                .setPositiveButton("是", listener)
-                .setNegativeButton("否", null).show();
-    }
-
-    public static void openApplicationSettingsActivity(Activity activity) {
+    public static Intent getApplicationSettingsIntent(Context context) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
-        activity.startActivity(intent);
+        intent.setData(Uri.fromParts("package", context.getPackageName(), null));
+        return intent;
     }
 
-    public static void openApplicationSettingsActivity(Activity activity, int requestCode) {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
-        activity.startActivityForResult(intent, requestCode);
-    }
+    public interface Callback {
+        void onPermissionsGranted();
 
-    public static void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults, PermissionCallback callback) {
-        List<String> granted = new ArrayList<>();
-        List<String> denied = new ArrayList<>();
-        for (int i = 0; i < permissions.length; i++) {
-            String perm = permissions[i];
-            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                granted.add(perm);
-            } else {
-                denied.add(perm);
-            }
-        }
-        // Report granted permissions, if any.
-        if (!granted.isEmpty()) {
-            String[] grantedArray = new String[granted.size()];
-            granted.toArray(grantedArray);
-            callback.onPermissionsGranted(requestCode, denied.isEmpty(), grantedArray);
-        }
-        // Report denied permissions, if any.
-        if (!denied.isEmpty()) {
-            String[] deniedArray = new String[denied.size()];
-            denied.toArray(deniedArray);
-            callback.onPermissionsDenied(requestCode, granted.isEmpty(), deniedArray);
-        }
-
+        void onPermissionsDenied(String[] permissions, Boolean[] isShowRequestPermissionRationale);
     }
 }
